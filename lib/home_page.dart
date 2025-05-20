@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:crappy_bird/barrier.dart';
 import 'package:crappy_bird/bird.dart';
+import 'package:crappy_bird/cover_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,12 +18,24 @@ class _HomePageState extends State<HomePage> {
   double time = 0;
   double gravity = -4.9; //sức nặng trọng lực
   double velocity = 3.5; //sức mạnh cú nhảy
+  double birdWidth = 0.2;
+  double birdHeight = 0.1;
 
   bool gameHasStarted = false;
 
+  int score = 0;
+  int highScore = 0;
+
+  static List<double> barrierX = [2, 2 + 1.5];
+  static double barrierWidth = 0.5;
+  List<List<double>> barrierHeight = [
+    [0.6, 0.4],
+    [0.4, 0.6],
+  ];
+
   void startGame() {
     gameHasStarted = true;
-    Timer.periodic(Duration(milliseconds: 50), (timer) {
+    Timer.periodic(Duration(milliseconds: 10), (timer) {
       height = gravity * time * time + velocity * time;
       setState(() {
         birdY = initialPos - height;
@@ -32,8 +46,29 @@ class _HomePageState extends State<HomePage> {
         _showDialog();
       }
 
+      moveMap();
+
       time += 0.01;
     });
+  }
+
+  void moveMap() {
+    for (int i = 0; i < barrierX.length; i++) {
+      setState(() {
+        barrierX[i] -= 0.005;
+      });
+
+      if (barrierX[i] < -1.5) {
+        barrierX[i] += 3;
+      }
+
+      if (barrierX[i] < 0 && barrierX[i] + 0.005 >= 0) {
+        score++;
+        if (score > highScore) {
+          highScore = score;
+        }
+      }
+    }
   }
 
   void jump() {
@@ -47,6 +82,16 @@ class _HomePageState extends State<HomePage> {
     if (birdY < -1 || birdY > 1) {
       return true;
     }
+
+    for (int i = 0; i < barrierX.length; i++) {
+      if (barrierX[i] <= birdWidth &&
+          barrierX[i] + barrierWidth >= -birdWidth &&
+          (birdY <= -1 + barrierHeight[i][0] ||
+              birdY + birdHeight >= 1 - barrierHeight[i][1])) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -57,6 +102,9 @@ class _HomePageState extends State<HomePage> {
       gameHasStarted = false;
       time = 0;
       initialPos = birdY;
+      height = 0;
+      barrierX = [2, 3.5];
+      score = 0;
     });
   }
 
@@ -108,7 +156,42 @@ class _HomePageState extends State<HomePage> {
                 child: Center(
                   child: Stack(
                     children: [
-                      MyBird(birdY: birdY),
+                      MyBird(
+                        birdY: birdY,
+                        birdWidth: birdWidth,
+                        birdHeight: birdHeight,
+                      ),
+
+                      MyCoverScreen(gameHasStarted: gameHasStarted),
+
+                      MyBarrier(
+                        barrierX: barrierX[0],
+                        barrierWidth: barrierWidth,
+                        barrierHeight: barrierHeight[0][0],
+                        isThisBottomBarrier: false,
+                      ),
+
+                      MyBarrier(
+                        barrierX: barrierX[0],
+                        barrierWidth: barrierWidth,
+                        barrierHeight: barrierHeight[0][1],
+                        isThisBottomBarrier: true,
+                      ),
+
+                      MyBarrier(
+                        barrierX: barrierX[1],
+                        barrierWidth: barrierWidth,
+                        barrierHeight: barrierHeight[1][0],
+                        isThisBottomBarrier: false,
+                      ),
+
+                      MyBarrier(
+                        barrierX: barrierX[1],
+                        barrierWidth: barrierWidth,
+                        barrierHeight: barrierHeight[1][1],
+                        isThisBottomBarrier: true,
+                      ),
+
                       Container(
                         alignment: Alignment(0, -0.5),
                         child: Text(
@@ -121,7 +204,34 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Expanded(child: Container(color: Colors.brown)),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                color: Colors.brown,
+                padding: EdgeInsets.symmetric(horizontal: 50),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Score: $score',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'High Score: $highScore',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
