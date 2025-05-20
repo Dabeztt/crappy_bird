@@ -26,6 +26,8 @@ class _HomePageState extends State<HomePage> {
   int score = 0;
   int highScore = 0;
 
+  bool isPaused = false;
+
   static List<double> barrierX = [2, 2 + 1.5];
   static double barrierWidth = 0.5;
   List<List<double>> barrierHeight = [
@@ -36,19 +38,21 @@ class _HomePageState extends State<HomePage> {
   void startGame() {
     gameHasStarted = true;
     Timer.periodic(Duration(milliseconds: 10), (timer) {
-      height = gravity * time * time + velocity * time;
-      setState(() {
-        birdY = initialPos - height;
-      });
+      if (!isPaused) {
+        height = gravity * time * time + velocity * time;
+        setState(() {
+          birdY = initialPos - height;
+        });
 
-      if (birdIsDead()) {
-        timer.cancel();
-        _showDialog();
+        if (birdIsDead()) {
+          timer.cancel();
+          _showDialog();
+        }
+
+        moveMap();
+
+        time += 0.01;
       }
-
-      moveMap();
-
-      time += 0.01;
     });
   }
 
@@ -191,6 +195,51 @@ class _HomePageState extends State<HomePage> {
                         barrierHeight: barrierHeight[1][1],
                         isThisBottomBarrier: true,
                       ),
+
+                      Positioned(
+                        top: 40,
+                        right: 20,
+                        child: IconButton(
+                          icon: Icon(
+                            isPaused ? Icons.play_arrow : Icons.pause,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isPaused = !isPaused;
+                            });
+                          },
+                        ),
+                      ),
+
+                      if (isPaused)
+                        Container(
+                          color: Colors.black54,
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Paused',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                  ),
+                                ),
+                                SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isPaused = false;
+                                    });
+                                  },
+                                  child: Text('Resume'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
 
                       Container(
                         alignment: Alignment(0, -0.5),
