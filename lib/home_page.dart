@@ -256,26 +256,68 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                color: Colors.brown,
-                padding: EdgeInsets.symmetric(horizontal: 50),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Score: $score',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                decoration: BoxDecoration(
+                  color: Colors.brown[700],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.brown.shade900.withOpacity(0.6),
+                      offset: Offset(0, -3),
+                      blurRadius: 8,
                     ),
-                    Text(
-                      'High Score: $highScore',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.star, color: Colors.yellow[600], size: 35),
+                        SizedBox(width: 10),
+                        Text(
+                          'Score: $score',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 35,
+                            fontWeight: FontWeight.w700,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black45,
+                                offset: Offset(1, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.emoji_events,
+                          color: Colors.amber[400],
+                          size: 35,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'High Score: $highScore',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 35,
+                            fontWeight: FontWeight.w600,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black38,
+                                offset: Offset(1, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
